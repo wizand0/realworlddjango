@@ -19,26 +19,26 @@ class FullnessFilter(admin.SimpleListFilter):
     parameter_name = 'fullness_filter'
 
     def lookups(self, request, model_admin):
-        return models.Event.FULLNESS_VARIANTS
+        filter_list = (
+            ('1', 'sold-out'),
+            ('2', '>50%'),
+            ('3', '<= 50%'),
+        )
+        return filter_list
 
     def queryset(self, request, queryset):
-        filter_value = self.value()
-        if filter_value:
-            events_id = []
-            if filter_value == models.Event.FULLNESS_FREE:
-                for event in queryset:
-                    if event.get_fullness_legend() == models.Event.FULLNESS_LEGEND_FREE:
-                        events_id.append(event.id)
-            elif filter_value == models.Event.FULLNESS_MIDDLE:
-                for event in queryset:
-                    if event.get_fullness_legend() == models.Event.FULLNESS_LEGEND_MIDDLE:
-                        events_id.append(event.id)
-            elif filter_value == models.Event.FULLNESS_FULL:
-                for event in queryset:
-                    if event.get_fullness_legend() == models.Event.FULLNESS_LEGEND_FULL:
-                        events_id.append(event.id)
-            return queryset.filter(id__in=events_id)
-        return queryset
+        events_id = []
+        result = ''
+        for el in self.lookup_choices:
+            if self.value() in el:
+                result = el[1]
+
+        for event in queryset:
+            sampling_principle = (str(event.display_places_left()).find(result) >= 0)
+            if sampling_principle == True:
+                events_id.append(event.id)
+
+        return queryset.filter(id__in=events_id)
 
 
 class ReviewInstanceInline(admin.TabularInline):
@@ -54,9 +54,10 @@ class ReviewInstanceInline(admin.TabularInline):
 @admin.register(models.Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'category', 'date_start', 'is_private',
-                    'participants_number', 'display_enroll_count', 'display_places_left', ]
-    list_display_links = ['id', 'title', ]
+                    'participants_number', 'display_enroll_count',
+                    'display_places_left', ]
     list_select_related = ['category']
+    list_display_links = ['id', 'title', ]
     list_filter = [FullnessFilter, 'category', 'features', ]
     ordering = ['date_start', ]
     filter_horizontal = ['features', ]
