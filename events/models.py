@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
+
+from realworlddjango import settings
 
 
 class Category(models.Model):
@@ -10,6 +13,7 @@ class Category(models.Model):
         # def book_count(self):
         # return self.books.count()
         return self.events.count()
+
     # display_options.short_description = 'Options'
     # Из лекции Настройка страницы списка
     display_event_count.short_description = 'Всего событий'
@@ -41,6 +45,13 @@ class Event(models.Model):
     is_private = models.BooleanField(default=False, verbose_name='Частное?')
     category = models.ForeignKey(Category, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
     features = models.ManyToManyField(Feature, blank=True)
+    logo = models.ImageField(upload_to='events/all_events', blank=True, null=True, verbose_name="Загрузить изображение")
+
+    def get_absolute_url(self):
+        return reverse('events:event_detail', args=[str(self.pk)])
+
+    def logo_url(self):
+        return self.logo.url if self.logo else f'{settings.STATIC_URL}images/svg-icon/event.svg'
 
     class Meta:
         verbose_name = 'Событие'
@@ -51,6 +62,7 @@ class Event(models.Model):
 
     def display_enroll_count(self):
         return self.enrolls.count()
+
     # display_options.short_description = 'Options'
     # Из лекции Настройка страницы списка
     display_enroll_count.short_description = 'Количество записей'
@@ -65,6 +77,7 @@ class Event(models.Model):
         elif available > (self.participants_number / 2):
             value = f'{available} (<= 50%)'
         return value
+
     # display_options.short_description = 'Options'
     # Из лекции Настройка страницы списка
     display_places_left.short_description = 'Сколько мест осталось?'
