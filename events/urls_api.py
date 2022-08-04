@@ -6,5 +6,5 @@ app_name = 'api_events'
 
 
 urlpatterns = [
-    path('reviews/create/', views.create_review.as_view(), name='create_review'),
+    path('reviews/create/', views.create_review, name='create_review'),
 ]

@@ -1,0 +1,27 @@
+
+<!-- Start TOP_BAR -->
+{% if user and user.is_authenticated %}
+<div class="container-fluid bg-white py-3">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-auto text-center ms-4">
+            <h4>События</h4>
+        </div>
+        <div class="col-auto text-center me-4">
+            <a href="#" class="btn btn-outline-primary">+ Добавить событие</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container-fluid bg-white py-3">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-auto text-center ms-4">
+                    <h4>Real World Django</h4>
+                </div>
+                <div class="col-auto text-center me-4">
+                    <a href="#" class="btn btn-outline-primary">Войти</a>
+                    <a href="#" class="btn btn-primary">Регистрация</a>
+                </div>
+            </div>
+        </div>
+{% endif %}
+<!-- End TOP_BAR -->
