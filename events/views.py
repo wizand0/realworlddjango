@@ -36,43 +36,68 @@ def Eventdetail(request, pk):
 
 @require_POST
 def create_review(request):
+
+    rate = ''
+    text = ''
+    created = ''
+    user_name = ''
+    ok = True
+    msg = ''
+
+    event_id = request.POST.get('event_id')
     rate = request.POST.get('rate')
     text = request.POST.get('text')
-    event_id = request.POST.get('event_id')
-    response = {
-        'ok': False,  # True если отзыв создан успешно, False в противном случае,
-        'msg': '',  # Сообщение об ошибке
-        'rate': rate,  # Оценка отзыва
-        'text': text,  # Текст отзыва
-        'created': '',  # Дата создания отзыва в формате DD.MM.YYYY
-        'user_name': '',  # Полное имя пользователя
-    }
-    if not (request.user and request.user.is_authenticated):
-        response['msg'] = 'Отзывы могут оставлять только зарегистрированные пользователи'
-        return JsonResponse(response)
+    user_req = request.user
+
+    if not request.user.is_authenticated:
+        user_req = None
+        ok = False
     else:
-        user = request.user
-        response['user_name'] = str(user)
+        user_name = user_req.__str__()
 
-    if not (rate and text):
-        response['msg'] = 'Оценка и текст отзыва - обязательные поля'
-        return JsonResponse(response)
+    event = Event.objects.get(pk=event_id)
+    created = datetime.date.today().strftime('%d.%m.%Y')
 
-    if Review.objects.filter(event=event_id, user=user).exists():
-        response['msg'] = 'Вы уже оставляли отзыв к этому событию'
-        return JsonResponse(response)
+    if Review.objects.filter(user=user_req, event=event).exists():
+        msg = 'Вы уже отправляли отзыв к этому событию'
+        ok = False
 
-    try:
-        new_review = Review()
-        new_review.user = user
-        new_review.event = Event.objects.get(pk=event_id)
-        new_review.rate = rate
-        new_review.text = text
-        new_review.save()
+    elif not event:
+        msg = 'Событие, на которое отправляете комментарий, не найдено!'
+        ok = False
 
-        response['created'] = str(new_review.created.strftime('%d.%m.%Y'))
-        response['ok'] = True
-    except:
-        response['msg'] = 'Ошибка при создании отзыва'
+    elif text == '' or rate == '':
+        msg = 'Оценка и текст отзыва - обязательные поля'
+        ok = False
 
-    return JsonResponse(response)
+    elif user_req and user_req.is_authenticated:
+        # добавляем в БД
+        try:
+            element = Review(
+                user = user_req,
+                event = event,
+                rate = rate,
+                text = text,
+                # created = created,
+                # updated = created
+            )
+            element.save()
+
+        except:
+            msg = 'комментарий не удалось сохранить в БД! '
+            ok = False
+
+    else:
+        msg = 'Отзывы могут отправлять только зарегистрированные пользователи'
+        ok = False
+
+    form_data = {
+        'ok': ok,  # True, если отзыв создан успешно
+        'msg': msg,  # Сообщение об ошибке
+        'rate': rate,  # оценка, - обязательно
+        'text': text,  # текст отзыва - обязательно
+        'created': created,  # Дата создания отзыва в формате DD.MM.YYYY
+        'user_name': user_name # 'admin'  # user_name, #Полное имя пользователя
+    }
+
+    return JsonResponse(form_data)
