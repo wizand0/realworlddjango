@@ -115,6 +115,12 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('events:event_detail', args=[str(self.pk)])
 
+    def get_update_url(self):
+        return reverse('events:event_update', args=[str(self.pk)])
+
+    def get_delete_url(self):
+        return reverse('events:event_delete', args=[str(self.pk)])
+
 
 
 

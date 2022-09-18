@@ -4,7 +4,7 @@
 
 {% block content %}
     <!-- Start CONTAINER_BAR -->
-<div class="container-fluid mt-3">
+        <div class="container-fluid mt-3">
             <div class="row mb-4">
                 <div class="col">
                     <div class="card shadow">
@@ -15,23 +15,17 @@
                                         <label for="category" class="form-label">Категория:</label>
                                         <select class="form-select" id="category">
                                             <option selected="">....................</option>
-                                            <option value="1">Спортивный турнир</option>
-                                            <option value="2">Семейное мероприятие</option>
-                                            <option value="3">Субботник</option>
-                                            <option value="4">Волонтерство</option>
-                                            <option value="5">Night Party</option>
-                                            <option value="6">Дилоги со звездой</option>
+                                            {% for categorty in category_objects %}
+                                                <option value="{{ forloop }}">{{ categorty }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-12">
                                         <label for="features" class="form-label">Свойства:</label>
                                         <select class="form-select" multiple="" id="features">
-                                            <option value="1">На открытом воздухе</option>
-                                            <option value="2">Приглашенная знаменитость</option>
-                                            <option value="3">Живая музыка</option>
-                                            <option value="4">Песни у костра</option>
-                                            <option value="5">Подарки участникам</option>
-                                            <option value="6"> Вечерние танцы</option>
+                                            {% for feature in feature_objects %}
+                                                <option value="{{ forloop }}">{{ feature }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-12 d-md-flex">
@@ -70,6 +64,7 @@
                     </div>
                 </div>
             </div>
+
             <ul class="pagination">
                 <li class="page-item"><a class="page-link" href="#" data-test="p_start">&laquo;</a></li>
                 <li class="page-item"><a class="page-link" href="#" data-test="p_previous">Previous</a></li>
@@ -79,22 +74,21 @@
                 <li class="page-item"><a class="page-link" href="#" data-test="p_next">Next</a></li>
                 <li class="page-item"><a class="page-link" href="#" data-test="p_end">&raquo;</a></li>
             </ul>
+
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-4">
                 {% for event in event_objects %}
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">{{event.title}}</h5>
-                            {% if event.is_private %}
-                                <span data-test="is_private" class="badge bg-dark">Private</span>
-                            {% endif %}
+                            <h5 class="card-title mb-0">{{ event.title }}</h5>
+                            <span data-test="is_private" class="badge bg-dark">{% if event.is_private %}Private{% endif %}</span>
                         </div>
                         <div class="card-body">
-                            <h3>{{event.display_enroll_count|default:"0"}} из {{event.participants_number}}</h3>
+                            <h3>{{ event.display_enroll_count }} из {{ event.participants_number }}</h3>
                             <p>участников</p>
                             <ul class="py-2">
-                                {% for feature in event.features.all %}
-                                    <li>{{feature}}</li>
+                                {%  for feature in event.features.get_queryset %}
+                                <li>{{ feature }}</li>
                                 {% endfor %}
                             </ul>
                             <p>
@@ -102,8 +96,8 @@
                             </p>
                         </div>
                         <div class="card-footer">
-                            <a href="{{event.get_absolute_url}}" class="btn btn-success">Смотреть</a>
-                            <a href="event_update.html" class="btn btn-outline-primary" title="Изменить">
+                            <a href="{{ event.get_absolute_url }}" class="btn btn-success">Смотреть</a>
+                            <a href="event_update2.html" class="btn btn-outline-primary" title="Изменить">
                                 <i class="bi bi-pencil-square"></i>Изменить
                             </a>
                         </div>
@@ -112,7 +106,7 @@
                 {% endfor %}
             </div>
         </div>
-    <!-- End CONTAINER_BAR -->
+        <!-- End CONTAINER_BAR -->
 {% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"

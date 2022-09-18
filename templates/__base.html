@@ -19,9 +19,12 @@
     {% include 'snippets/_left-menu.html' %}
     <!-- Start MAIN_CONTAINER -->
     <div class="rightbar">
+        {% include "snippets/_messages.html" %}
         {% include 'snippets/_header.html' %}
+
         {% block content %}{% endblock %}
         {% include 'snippets/_footer.html' %}
+
     </div>
     <!-- End MAIN_CONTAINER -->
 </div>
